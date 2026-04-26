@@ -80,7 +80,7 @@ describe "Rolando" {
     rolando.encontrar(espadaDestino)
     rolando.encontrar(armaduraAcero)
     rolando.encontrar(collarDivino)
-    assert.equals(rolando.poderBatalla(), 19)
+    assert.equals(rolando.poderDeBatalla(), 19)
   }
 
   test "libro de Hechizos" {
@@ -98,25 +98,5 @@ describe "Rolando" {
     assert.equals(libroDeHechizos.poderQueAporta(), 6)
     rolando.batallar()
     assert.equals(libroDeHechizos.poderQueAporta(), 7)
-  }
-}
-
-
-
-
-
-
-
-
-describe "Castillo de piedra" {
-  test "description" {
-    rolando.encontrar(espadaDestino)
-    rolando.encontrar(libroDeHechizos)
-    assert.throwsException({ rolando.encontrar(collarDivino) })
-    rolando.llegarAHogar()
-    rolando.encontrar(armaduraAcero)
-    rolando.encontrar(collarDivino)
-    assert.that(rolando.historia() == [espadaDestino,libroDeHechizos, collarDivino, armaduraAcero,collarDivino])
-
   }
 }

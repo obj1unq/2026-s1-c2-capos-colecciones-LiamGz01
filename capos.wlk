@@ -2,11 +2,13 @@ object rolando {
     const mochila = #{}
     var property hogar = castilloPiedra
     const historia = []
+    const enemigosDeErethia = #{caterina, archibaldo, astra}
+
     var property tamañoMochila = 2
 
     var property poderBase = 5
 
-    method poderBatalla() {
+    method poderDeBatalla() {
       return self.poderBase() + self.poderDeArtefactos()
     }
 
@@ -55,6 +57,22 @@ object rolando {
       self.mochila().forEach({artefacto => artefacto.usar()})
 
       poderBase = poderBase + 1
+    }
+
+    method puedeVencer(enemigo) {
+      return (self.poderDeBatalla() > enemigo.poderDePelea())
+    }
+
+    method enemigosVencidos() {
+      return enemigosDeErethia.filter({enemigo => self.puedeVencer(enemigo)})
+    }
+
+    method moradasConquistadas() {
+      return self.enemigosVencidos().map({enemigo => enemigo.morada()})
+    }
+
+    method esPoderoso() {
+      return enemigosDeErethia.all({enemigo => self.puedeVencer(enemigo)})
     }
     
 }
@@ -165,18 +183,27 @@ object armaduraAcero {
 //Enemigo de Rolando
 
 object caterina {
+  const morada = "FortalezaDeAcero"
   const poderDePelea = 28
 
   method poderDePelea() {
     return poderDePelea
   } 
+  method morada() {
+    return morada
+  }
 }
 
 object archibaldo {
+  const morada = "PalacioDeMarmol"
   const poderDepelea = 16
 
   method poderDepelea() {
     return poderDepelea
+  }
+
+  method morada() {
+    return morada
   }
 }
 

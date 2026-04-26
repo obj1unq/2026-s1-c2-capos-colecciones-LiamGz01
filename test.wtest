@@ -1,0 +1,133 @@
+import capos.*
+
+
+describe "Rolando" {
+    method initialize() {
+      rolando.tamañoMochila(2)
+    }
+  test "Rolando encuentra la espada del destino" {
+    rolando.encontrar(espadaDestino)
+    assert.that(rolando.mochila().contains(espadaDestino))
+  }
+
+  test "Rolando encuentra el libro de hechizos" {
+    rolando.encontrar(libroDeHechizos)
+    assert.that(rolando.mochila().contains(libroDeHechizos))
+  }
+
+  test "Rolando encuentra el collar divino (no lo recolecta, ya que tiene la espada y el libro encima y su capacidad es de 2)" {
+    const mochila = #{espadaDestino,libroDeHechizos}
+    rolando.encontrar(collarDivino)
+    assert.throwsException(rolando.mochila().contains(collarDivino))
+    //assert.notThat(rolando.mochila().contains(collarDivino))
+  }
+
+  test "Rolando llega al castillo de piedra (deja en el castillo la espada y el libro de hechizos)" {
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(libroDeHechizos)
+    rolando.llegarAHogar()
+    assert.that(castilloPiedra.almacen().contains(espadaDestino))
+    assert.that(castilloPiedra.almacen().contains(libroDeHechizos))
+    rolando.encontrar(collarDivino)
+    rolando.llegarAHogar()
+    assert.that(castilloPiedra.almacen().contains(collarDivino))
+  }
+
+  test "description" {
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(libroDeHechizos)
+    assert.throwsException({ rolando.encontrar(collarDivino) })
+    rolando.llegarAHogar()
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    assert.that(rolando.historia() == [espadaDestino,libroDeHechizos, collarDivino, armaduraAcero,collarDivino])
+
+  }
+
+  test "Comportamiento de los artefactos" {
+    rolando.poderBase(5)
+    rolando.tamañoMochila(3)
+
+    //const mochila = [espadaDestino,armaduraAcero, collarDivino]
+/*aca tuve dudas sobre si podia hacer una const de mochila pero segun investigue,
+   al ser una constante local no se guardaba dentro del objeto rolando  
+*/
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    assert.equals(espadaDestino.poderQueAporta(), 5)
+    assert.equals(armaduraAcero.poderQueAporta(), 6)
+    assert.equals(collarDivino.poderQueAporta(), 3)
+    rolando.batallar()
+    assert.equals(espadaDestino.poderQueAporta(), 3)
+    assert.equals(armaduraAcero.poderQueAporta(), 6)
+    assert.equals(collarDivino.poderQueAporta(), 3)
+    rolando.batallar()
+    assert.equals(rolando.poderBase(), 7)
+    assert.equals(espadaDestino.poderQueAporta(), 3.5)
+    assert.equals(armaduraAcero.poderQueAporta(), 6)
+    assert.equals(collarDivino.poderQueAporta(), 5)
+    rolando.batallar()
+    assert.equals(rolando.poderBase(), 8)
+    assert.equals(espadaDestino.poderQueAporta(), 4)
+    assert.equals(armaduraAcero.poderQueAporta(), 6)
+    assert.equals(collarDivino.poderQueAporta(), 6)
+  }
+
+  test "Ejemplo de poder de pelea" {
+    rolando.poderBase(5)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    assert.equals(rolando.poderDeBatalla(), 19)
+  }
+
+  test "libro de Hechizos" {
+    rolando.poderBase(5)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    rolando.llegarAHogar()
+    rolando.encontrar(libroDeHechizos)
+    //const almacen = #{espadaDestino, armaduraAcero, collarDivino}
+    const hechizos = [bendicion, invisibilidad, invocacion]
+    assert.equals(libroDeHechizos.poderQueAporta(), 4)
+    rolando.batallar()
+    assert.equals(libroDeHechizos.poderQueAporta(), 6)
+    rolando.batallar()
+    assert.equals(libroDeHechizos.poderQueAporta(), 7)
+  }
+
+  test "enemigos de rolando" {
+    rolando.poderBase(5)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    //assert.equals(rolando.poderDeBatalla(), 19)
+    assert.that(rolando.puedeVencer(archibaldo))
+    assert.that(rolando.puedeVencer(astra))
+    const moradasConquitadas = rolando.moradasConquistadas()
+    assert.that(moradasConquitadas.contains("PalacioDeMarmol"))
+    assert.that(moradasConquitadas.contains("TorreDeMarfil"))
+    rolando.poderBase(10)
+    assert.that(rolando.esPoderoso())
+  }
+
+
+  test "tiene rolando artefacto fatal" {
+    rolando.poderBase(15)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    
+    assert.that(rolando.tieneArtefactoFatalPara(astra))
+
+    assert.equals(espadaDestino, rolando.artefactoFatalPara(astra))
+
+    assert.notThat(rolando.tieneArtefactoFatalPara(caterina))
+  }
+}

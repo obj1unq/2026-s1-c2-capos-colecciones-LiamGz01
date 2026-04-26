@@ -11,7 +11,7 @@ object rolando {
     }
 
     method poderDeArtefactos() {
-      return mochila.sum({artefacto => artefacto.poder()})
+      return mochila.sum({artefacto => artefacto.poderQueAporta()})
     }
 
     method encontrar(artefacto) {
@@ -52,12 +52,9 @@ object rolando {
     }
 
     method batallar() {
-      if (self.mochila().contains(espadaDestino)){
-        espadaDestino.usado(true)
-      }
-      if (self.mochila().contains(collarDivino)) {
-        collarDivino.vecesUsado()
-      }
+      self.mochila().forEach({artefacto => artefacto.usar()})
+
+      poderBase = poderBase + 1
     }
     
 }
@@ -79,10 +76,14 @@ object castilloPiedra {
 }
 
 object espadaDestino {
-  var property usado = false
+  var property artefactoUsado = false
 
-  method poder() {
-    if (usado){
+  method usar() {
+    artefactoUsado = true
+  }
+
+  method poderQueAporta() {
+    if (artefactoUsado){
         return rolando.poderBase() /2
     }else{
         return rolando.poderBase()
@@ -91,17 +92,56 @@ object espadaDestino {
 }
 
 object libroDeHechizos {
-  
+
+  const hechizos = [bendicion, invisibilidad, invocacion]
+
+  method poderQueAporta() {
+    if (hechizos.isEmpty()){
+      return 0
+    }else{
+      return hechizos.first().poderQueAporta()
+    }
+  }
+
+  method usar() {
+    if (!hechizos.isEmpty()){
+      hechizos.remove(hechizos.first())
+    }
+  }
 }
+object bendicion {
+  const poderQueAporta = 4
+
+  method poderQueAporta() {
+    return poderQueAporta
+  } 
+}
+object invisibilidad {
+  method poderQueAporta() {
+    return rolando.poderBase()
+  }
+}
+object invocacion {
+  
+  method poderQueAporta() {
+    if (castilloPiedra.almacen().isEmpty()) {
+      return 0
+    }else{
+      const masPoderoso = castilloPiedra.almacen().max({artefacto => artefacto.poderQueAporta()})
+      return masPoderoso.poderQueAporta()
+    }
+  }
+}
+
 
 object collarDivino {
   var property vecesUsado = 0 
 
-  method vecesUsado() {
-    return vecesUsado + 1
+  method usar() {
+    vecesUsado = vecesUsado + 1
   }
 
-  method poder() {
+  method poderQueAporta() {
     if (rolando.poderBase() > 6) {
         return 3 + vecesUsado
     }else{
@@ -111,9 +151,44 @@ object collarDivino {
 }
 
 object armaduraAcero {
-  const property poder = 6
+  const property poderQueAporta = 6
 
-  method poder() {
-    return poder
+  method poderQueAporta() {
+    return poderQueAporta
+  }
+
+  method usar() {
+    return poderQueAporta
+  }
+}
+
+//Enemigo de Rolando
+
+object caterina {
+  const poderDePelea = 28
+
+  method poderDePelea() {
+    return poderDePelea
+  } 
+}
+
+object archibaldo {
+  const poderDepelea = 16
+
+  method poderDepelea() {
+    return poderDepelea
+  }
+}
+
+object astra {
+  const morada = "TorreDeMarfil" 
+  const poderDePelea = 14
+
+  method poderDePelea() {
+    return poderDePelea
+  }
+
+  method morada() {
+    return morada
   }
 }

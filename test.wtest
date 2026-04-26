@@ -99,4 +99,35 @@ describe "Rolando" {
     rolando.batallar()
     assert.equals(libroDeHechizos.poderQueAporta(), 7)
   }
+
+  test "enemigos de rolando" {
+    rolando.poderBase(5)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    //assert.equals(rolando.poderDeBatalla(), 19)
+    assert.that(rolando.puedeVencer(archibaldo))
+    assert.that(rolando.puedeVencer(astra))
+    const moradasConquitadas = rolando.moradasConquistadas()
+    assert.that(moradasConquitadas.contains("PalacioDeMarmol"))
+    assert.that(moradasConquitadas.contains("TorreDeMarfil"))
+    rolando.poderBase(10)
+    assert.that(rolando.esPoderoso())
+  }
+
+
+  test "tiene rolando artefacto fatal" {
+    rolando.poderBase(15)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    
+    assert.that(rolando.tieneArtefactoFatalPara(astra))
+
+    assert.equals(espadaDestino, rolando.artefactoFatalPara(astra))
+
+    assert.notThat(rolando.tieneArtefactoFatalPara(caterina))
+  }
 }

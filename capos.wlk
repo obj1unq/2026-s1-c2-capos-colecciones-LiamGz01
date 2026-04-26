@@ -74,6 +74,14 @@ object rolando {
     method esPoderoso() {
       return enemigosDeErethia.all({enemigo => self.puedeVencer(enemigo)})
     }
+
+    method tieneArtefactoFatalPara(enemigo) {
+      return mochila.any({artefacto => artefacto.poderQueAporta() > enemigo.poderDePelea()})
+    }
+
+    method artefactoFatalPara(enemigo) {
+      return mochila.find({ artefacto => artefacto.poderQueAporta() > enemigo.poderDePelea()})
+    }
     
 }
 
@@ -196,10 +204,10 @@ object caterina {
 
 object archibaldo {
   const morada = "PalacioDeMarmol"
-  const poderDepelea = 16
+  const poderDePelea = 16
 
-  method poderDepelea() {
-    return poderDepelea
+  method poderDePelea() {
+    return poderDePelea
   }
 
   method morada() {

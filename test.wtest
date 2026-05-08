@@ -16,10 +16,10 @@ describe "Rolando" {
   }
 
   test "Rolando encuentra el collar divino (no lo recolecta, ya que tiene la espada y el libro encima y su capacidad es de 2)" {
-    const mochila = #{espadaDestino,libroDeHechizos}
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(libroDeHechizos)
     rolando.encontrar(collarDivino)
-    assert.throwsException(rolando.mochila().contains(collarDivino))
-    //assert.notThat(rolando.mochila().contains(collarDivino))
+    assert.notThat(rolando.mochila().contains(collarDivino))
   }
 
   test "Rolando llega al castillo de piedra (deja en el castillo la espada y el libro de hechizos)" {
@@ -33,15 +33,18 @@ describe "Rolando" {
     assert.that(castilloPiedra.almacen().contains(collarDivino))
   }
 
-  test "description" {
+
+  test "historia de Rolando" {
     rolando.encontrar(espadaDestino)
     rolando.encontrar(libroDeHechizos)
-    assert.throwsException({ rolando.encontrar(collarDivino) })
+    rolando.encontrar(collarDivino)
+    assert.notThat(rolando.mochila().contains(collarDivino))
+    //assert.throwsException({ rolando.encontrar(collarDivino) })
     rolando.llegarAHogar()
     rolando.encontrar(armaduraAcero)
     rolando.encontrar(collarDivino)
-    assert.that(rolando.historia() == [espadaDestino,libroDeHechizos, collarDivino, armaduraAcero,collarDivino])
-
+    //assert.that(rolando.historia() == [espadaDestino,libroDeHechizos, collarDivino, armaduraAcero,collarDivino])
+    assert.equals([espadaDestino,libroDeHechizos, collarDivino, armaduraAcero,collarDivino], rolando.historia())
   }
 
   test "Comportamiento de los artefactos" {
@@ -55,23 +58,23 @@ describe "Rolando" {
     rolando.encontrar(espadaDestino)
     rolando.encontrar(armaduraAcero)
     rolando.encontrar(collarDivino)
-    assert.equals(espadaDestino.poderQueAporta(), 5)
+    assert.equals(espadaDestino.poderQueAporta(rolando), 5)
     assert.equals(armaduraAcero.poderQueAporta(), 6)
-    assert.equals(collarDivino.poderQueAporta(), 3)
+    assert.equals(collarDivino.poderQueAporta(rolando), 3)
     rolando.batallar()
-    assert.equals(espadaDestino.poderQueAporta(), 3)
+    assert.equals(espadaDestino.poderQueAporta(rolando), 3)
     assert.equals(armaduraAcero.poderQueAporta(), 6)
-    assert.equals(collarDivino.poderQueAporta(), 3)
+    assert.equals(collarDivino.poderQueAporta(rolando), 3)
     rolando.batallar()
     assert.equals(rolando.poderBase(), 7)
-    assert.equals(espadaDestino.poderQueAporta(), 3.5)
+    assert.equals(espadaDestino.poderQueAporta(rolando), 3.5)
     assert.equals(armaduraAcero.poderQueAporta(), 6)
-    assert.equals(collarDivino.poderQueAporta(), 5)
+    assert.equals(collarDivino.poderQueAporta(rolando), 5)
     rolando.batallar()
     assert.equals(rolando.poderBase(), 8)
-    assert.equals(espadaDestino.poderQueAporta(), 4)
+    assert.equals(espadaDestino.poderQueAporta(rolando), 4)
     assert.equals(armaduraAcero.poderQueAporta(), 6)
-    assert.equals(collarDivino.poderQueAporta(), 6)
+    assert.equals(collarDivino.poderQueAporta(rolando), 6)
   }
 
   test "Ejemplo de poder de pelea" {
@@ -92,13 +95,29 @@ describe "Rolando" {
     rolando.llegarAHogar()
     rolando.encontrar(libroDeHechizos)
     //const almacen = #{espadaDestino, armaduraAcero, collarDivino}
-    const hechizos = [bendicion, invisibilidad, invocacion]
-    assert.equals(libroDeHechizos.poderQueAporta(), 4)
+    //const hechizos = [bendicion, invisibilidad, invocacion]
+    assert.equals(libroDeHechizos.poderQueAporta(rolando), 4)
     rolando.batallar()
-    assert.equals(libroDeHechizos.poderQueAporta(), 6)
+    assert.equals(libroDeHechizos.poderQueAporta(rolando), 6)
     rolando.batallar()
-    assert.equals(libroDeHechizos.poderQueAporta(), 7)
+    assert.equals(libroDeHechizos.poderQueAporta(rolando), 7)
   }
+  test "libros de hechizo 2" {
+    rolando.poderBase(5)
+    rolando.tamañoMochila(3)
+    rolando.encontrar(espadaDestino)
+    rolando.encontrar(armaduraAcero)
+    rolando.encontrar(collarDivino)
+    rolando.llegarAHogar()
+    rolando.encontrar(libroDeHechizos)
+    assert.equals(4, libroDeHechizos.poderQueAporta(rolando))
+    rolando.batallar()
+    assert.equals(6, libroDeHechizos.poderQueAporta(rolando))
+
+  }
+
+
+
 
   test "enemigos de rolando" {
     rolando.poderBase(5)
@@ -110,8 +129,8 @@ describe "Rolando" {
     assert.that(rolando.puedeVencer(archibaldo))
     assert.that(rolando.puedeVencer(astra))
     const moradasConquitadas = rolando.moradasConquistadas()
-    assert.that(moradasConquitadas.contains("PalacioDeMarmol"))
-    assert.that(moradasConquitadas.contains("TorreDeMarfil"))
+    assert.that(rolando.moradasConquistadas().contains(palacioDeMarmol))
+    assert.that(rolando.moradasConquistadas().contains(torreDeMarfil))
     rolando.poderBase(10)
     assert.that(rolando.esPoderoso())
   }

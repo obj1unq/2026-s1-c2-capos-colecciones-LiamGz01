@@ -2,8 +2,9 @@ object rolando {
     const mochila = #{}
     var property hogar = castilloPiedra
     const historia = []
-    const enemigosDeErethia = #{caterina, archibaldo, astra}
-
+    //const enemigosDeErethia = #{caterina, archibaldo, astra}
+    
+    
     var property tamañoMochila = 2
 
     var property poderBase = 5
@@ -13,17 +14,25 @@ object rolando {
     }
 
     method poderDeArtefactos() {
-      return mochila.sum({artefacto => artefacto.poderQueAporta()})
+      return mochila.sum({artefacto => artefacto.poderQueAporta(self)})
     }
 
     method encontrar(artefacto) {
-        if (mochila.size() == tamañoMochila){
+
+// CODIGO ANTERIOR
+        /*if (mochila.size() == tamañoMochila){
             historia.add(artefacto)
             self.error("No puede levantar objeto")
         }else{
             mochila.add(artefacto)
             historia.add(artefacto)
+        }*/
+        
+        if (mochila.size() != tamañoMochila){
+          mochila.add(artefacto)
         }
+        historia.add(artefacto)
+        
     }
 
     method mochila() {
@@ -35,6 +44,7 @@ object rolando {
         posesiones.addAll(mochila)
         posesiones.addAll(hogar.almacen())
         return posesiones
+        //return mochila + hogar.almacen()
     }
 
     method historia() {
@@ -47,6 +57,7 @@ object rolando {
 
     method llegarAHogar() {
       hogar.depositasArtefactosDe(self)
+      self.mochila().clear()
     }
 
     method almacenDe() {
@@ -64,7 +75,8 @@ object rolando {
     }
 
     method enemigosVencidos() {
-      return enemigosDeErethia.filter({enemigo => self.puedeVencer(enemigo)})
+      return erethia.enemigos().filter({enemigo => self.puedeVencer(enemigo)})
+//      return enemigosDeErethia.filter({enemigo => self.puedeVencer(enemigo)})
     }
 
     method moradasConquistadas() {
@@ -72,33 +84,52 @@ object rolando {
     }
 
     method esPoderoso() {
-      return enemigosDeErethia.all({enemigo => self.puedeVencer(enemigo)})
+      return erethia.enemigos().all({enemigo => self.puedeVencer(enemigo)})
+//      return enemigosDeErethia.all({enemigo => self.puedeVencer(enemigo)})
     }
 
     method tieneArtefactoFatalPara(enemigo) {
-      return mochila.any({artefacto => artefacto.poderQueAporta() > enemigo.poderDePelea()})
+      return mochila.any({artefacto => artefacto.poderQueAporta(self) > enemigo.poderDePelea()})
     }
 
     method artefactoFatalPara(enemigo) {
-      return mochila.find({ artefacto => artefacto.poderQueAporta() > enemigo.poderDePelea()})
+      return mochila.find({ artefacto => artefacto.poderQueAporta(self) > enemigo.poderDePelea()})
     }
     
+}
+
+object erethia {
+  const enemigos = #{caterina, archibaldo, astra}
+
+  method enemigos() {
+    return enemigos
+  }
 }
 
 object castilloPiedra {
   const almacen = #{}
 
+  method hogarConArtefactos() {
+      return almacen.isEmpty()
+    }
   method depositasArtefactosDe(personaje) {
     almacen.addAll(personaje.mochila())
-    personaje.mochila().clear()
-    //posesiones.addAll(almacen)
+        
   }
 
   method almacen() {
     return almacen
   }
 
+  
+  method tieneArtefactos() {
+    return !almacen.isEmpty()
+  }
+  
 
+  method artefactoMasPoderoso(personaje) {
+    return almacen.max({ artefacto => artefacto.poderQueAporta(personaje) })
+  }
 }
 
 object espadaDestino {
@@ -107,54 +138,75 @@ object espadaDestino {
   method usar() {
     artefactoUsado = true
   }
-
-  method poderQueAporta() {
+  /*method poderQueAporta() {
     if (artefactoUsado){
         return rolando.poderBase() /2
     }else{
         return rolando.poderBase()
     }
+  }*/
+    method poderQueAporta(personaje) {
+    if (artefactoUsado){
+        return personaje.poderBase() /2
+    }else{
+        return personaje.poderBase()
+    }
   }
 }
 
 object libroDeHechizos {
-
   const hechizos = [bendicion, invisibilidad, invocacion]
 
-  method poderQueAporta() {
+  method poderQueAporta(personaje) {
     if (hechizos.isEmpty()){
       return 0
     }else{
-      return hechizos.first().poderQueAporta()
+      return hechizos.first().poderQueAporta(personaje)
     }
   }
-
   method usar() {
     if (!hechizos.isEmpty()){
       hechizos.remove(hechizos.first())
     }
   }
 }
+
 object bendicion {
   const poderQueAporta = 4
 
-  method poderQueAporta() {
+  method poderQueAporta(personaje) {
     return poderQueAporta
   } 
 }
 object invisibilidad {
-  method poderQueAporta() {
+  /*method poderQueAporta() {
     return rolando.poderBase()
+  }*/
+  
+  method poderQueAporta(personaje) {
+    return personaje.poderBase()
   }
+  
 }
 object invocacion {
   
-  method poderQueAporta() {
+  /*method poderQueAporta() {
+//  if (castilloPiedra.tieneArtefactos()) {
     if (castilloPiedra.almacen().isEmpty()) {
       return 0
     }else{
       const masPoderoso = castilloPiedra.almacen().max({artefacto => artefacto.poderQueAporta()})
       return masPoderoso.poderQueAporta()
+    }
+  }*/
+
+  
+  method poderQueAporta(personaje) {
+    if (personaje.hogar().hogarConArtefactos()) {
+      return 0
+    }else{
+      const masPoderoso = personaje.hogar().artefactoMasPoderoso(personaje)
+      return masPoderoso.poderQueAporta(personaje)
     }
   }
 }
@@ -166,20 +218,29 @@ object collarDivino {
   method usar() {
     vecesUsado = vecesUsado + 1
   }
-
-  method poderQueAporta() {
-    if (rolando.poderBase() > 6) {
+  /*
+  method poderQueAporta() { // poderQueAporta(personaje)
+    if (rolando.poderBase() > 6) { // if (personaje.poderBase() > 6)
         return 3 + vecesUsado
     }else{
         return 3
     }
+  }*/
+  method poderQueAporta(personaje) {
+    if (personaje.poderBase() > 6) {
+      return 3 + vecesUsado
+    }else{
+      return 3
+    }
   }
+
+
 }
 
 object armaduraAcero {
   const property poderQueAporta = 6
 
-  method poderQueAporta() {
+  method poderQueAporta(personaje) {
     return poderQueAporta
   }
 
@@ -191,7 +252,7 @@ object armaduraAcero {
 //Enemigo de Rolando
 
 object caterina {
-  const morada = "FortalezaDeAcero"
+  const morada = fortalezaDeAcero
   const poderDePelea = 28
 
   method poderDePelea() {
@@ -202,8 +263,12 @@ object caterina {
   }
 }
 
+object fortalezaDeAcero {
+  
+}
+
 object archibaldo {
-  const morada = "PalacioDeMarmol"
+  const morada = palacioDeMarmol
   const poderDePelea = 16
 
   method poderDePelea() {
@@ -215,8 +280,12 @@ object archibaldo {
   }
 }
 
+object palacioDeMarmol {
+  
+}
+
 object astra {
-  const morada = "TorreDeMarfil" 
+  const morada = torreDeMarfil  
   const poderDePelea = 14
 
   method poderDePelea() {
@@ -226,4 +295,8 @@ object astra {
   method morada() {
     return morada
   }
+}
+
+object torreDeMarfil {
+  
 }
